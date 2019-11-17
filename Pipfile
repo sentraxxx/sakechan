@@ -10,6 +10,7 @@ v = {editable = true,version = "*"}
 [packages]
 beautifulsoup4 = "*"
 requests = "*"
+boto3 = "*"
 
 [requires]
 python_version = "3.6"

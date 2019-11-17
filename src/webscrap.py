@@ -7,6 +7,7 @@ import json
 import time
 import warnings
 import logging
+from dictionary import dictctrl
 
 LOG_LEVEL = logging.DEBUG
 
@@ -14,6 +15,11 @@ class webscrapper():
     """[summary]
     Webからリストを取得し、master_dictを更新する
     """
+    warnings.simplefilter(
+        'ignore', requests.urllib3.exceptions.InsecureRequestWarning)            
+    logging.basicConfig(filename='./log/sake.log', level=LOG_LEVEL)
+
+
     # web_nameリスト
     WEB_SAKETIMES = 'SAKETIMES'      
 
@@ -23,7 +29,7 @@ class webscrapper():
     SAKETIMES_FILE_ERR = './dict/saketimes/dict_saketimes_err.log'
     IS_SAKETIMES_NEED = False
 
-    def __init__(self,fp_master_dict, web_name):
+    def __init__(self, web_name):
         """[summary]
          指定したwebからリストを取得し、dictを更新する。\n
         新規 meigara は追加\n
@@ -33,13 +39,7 @@ class webscrapper():
             fp_master_dict {[str]} -- [書き込み先辞書のファイルパス]\n
             web_name {[str]} -- [対象web名, ex. SAKETIMES]
         """        
-        warnings.simplefilter(
-            'ignore', requests.urllib3.exceptions.InsecureRequestWarning)            
-        logging.basicConfig(filename='./log/sake.log', level=LOG_LEVEL)
-
-        self.fp_dict = dict
         self.web_name = web_name
-
 
     def writeSAKETIMES2dict(self):
         """[summary]
@@ -52,6 +52,7 @@ class webscrapper():
             fr.close
 
         show = True
+        sake_list_dict = []
         for area in saketimesd:
             for prefecture in saketimesd[area]:
                 for sakagura in saketimesd[area][prefecture]['sakagura']:
@@ -63,6 +64,8 @@ class webscrapper():
                     homepage = saketimesd[area][prefecture]['sakagura'][sakagura]['homepage']
 
                     item = {
+                        'area': area,
+                        'prefecture': prefecture,
                         'url':url,
                         'meigara': meigara,
                         'meigara_yomi': meigara_yomi,
@@ -70,19 +73,26 @@ class webscrapper():
                         'sakagura_name_yomi': sakagura_name_yomi,
                         'homepage': homepage
                     }
+                    sake_list_dict.append(item)
 
-                    if show:
-                        print(item)
-                        show = False
+#                    if show:
+#                        print(item)
+#                        show = False
+
+        logging.info(f'aws dynamo[SAKE_LIST] batchupdate start. record = {len(sake_list_dict)}')
+        db = dictctrl()
+        db.batchupdate(sake_list_dict)
+
+        
 
 
     def getWeb(self):
 
-        if web_name == self.WEB_SAKETIMES:
-            if self.IS_SAKETIMES_NEED:
+        if self.web_name == webscrapper.WEB_SAKETIMES:
+            if webscrapper.IS_SAKETIMES_NEED:
                 self.getSAKETIMES
             else:
-               logging.INFO(f'scrap web({self.WEB_SAKETIMES}) is skipped.') 
+               logging.info(f'scrap web({webscrapper.WEB_SAKETIMES}) is skipped.') 
 
 
     def getSAKETIMES(self):
@@ -103,12 +113,13 @@ class webscrapper():
 
         # topページアクセス
         try:
-            r = requests.get(SAKETIMES_URL, verify=False)
+            r = requests.get(webscrapper.SAKETIMES_URL, verify=False)
             bf_top = BeautifulSoup(r.text, 'html.parser')
         except RemoteDisconnected as e:
             print(
-                f'** RemoteDisconnected Exeption occured while get {SAKETIMES_URL}')
-            logging.warning(f'{time.localtime}: ** RemoteDisconnected Exeption occured while get {SAKETIMES_URL}')
+                f'** RemoteDisconnected Exeption occured while get {webscrapper.SAKETIMES_URL}')
+            print(e.strerror)
+            logging.warning(f'{time.localtime}: ** RemoteDisconnected Exeption occured while get {webscrapper.SAKETIMES_URL}')
             return
 
         # area_list 読み込み
@@ -244,7 +255,7 @@ class webscrapper():
         print(f'++ scrapping from {self.web_name} end. total= {count_sakagura} sakelist!')
 
         # SAKETIMES読み込み完了. 一時ファイルに書き込み.
-        with open(SAKETIMES_FILE, mode='w') as fw:
+        with open(webscrapper.SAKETIMES_FILE, mode='w') as fw:
             json.dump(d, fw)
             print('+ write sakedict.txt complete')
             fw.close

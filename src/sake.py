@@ -23,7 +23,7 @@ def sake_handler(event, context):
     elif event['event'] == 'updatedictionary':
         if event['option']['source'] == webscrapper.WEB_SAKETIMES:
             print('webscrap start: SAKETIMES')
-            scrapper = webscrapper(MASTER_DICT_FILE, webscrapper.WEB_SAKETIMES)
+            scrapper = webscrapper(webscrapper.WEB_SAKETIMES)
             scrapper.writeSAKETIMES2dict()
     else:
         print('no action')
