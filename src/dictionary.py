@@ -17,7 +17,7 @@ class dictctrl():
         print("Table status:", self.table.table_status)
 
 
-    def batchupdate(self, items:list):        
+    def batchupdate(self, items:list):    
         """ item(dictionary)をdynamodbにupdateする.
         itemの必須項目は('prefecture'(PRYMARY_KEY),'meigara'(SORT_KEY) )
         """
@@ -40,5 +40,18 @@ class dictctrl():
             item {[dict]} -- [must 'prefecture', 'meigara']
         """        
         print('update')
+
+    def query(self, **queryoptions) -> dict:
+        """[summary]
+        
+        Arguments:
+            **queryoptions{[dict]} -- [クエリ―オプション\n
+             - ]
+
+        Returns:
+            dict -- [description]
+        """        
+
+        print('query start')
 
 

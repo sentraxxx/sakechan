@@ -63,6 +63,14 @@ class webscrapper():
                     meigara_yomi =saketimesd[area][prefecture]['sakagura'][sakagura]['meigara_yomi']
                     homepage = saketimesd[area][prefecture]['sakagura'][sakagura]['homepage']
 
+                    # 空白はaws dynamodbでNGなので'none'に変更.
+                    if url=='': url='none'
+                    if meigara=='': url='none'
+                    if meigara_yomi=='': url='none'
+                    if homepage=='': url='none'
+                    if sakagura_name=='': url='none'
+                    if sakagura_name_yomi=='': url='none'
+
                     item = {
                         'area': area,
                         'prefecture': prefecture,

@@ -10,6 +10,11 @@ from webscrap import webscrapper
 
 MASTER_DICT_FILE = './dict/master/sake_dict.txt'
 
+## Handler Actions.
+# web sourceからDB更新 
+UPDATE_DB_FROM_WEB = 'updatedictionary'
+# DBへitem登録(単発)
+UPDATE_DB_BY_ITEM = 'updateitem'
 
 READ_SAKETIMES = False
 
@@ -18,15 +23,20 @@ def sake_handler(event, context):
     print(f'** start {sys._getframe().f_code.co_name}')
 
     if event['event'] == 'query':
-        pass
+        queryoption = event['option']
+
 
     elif event['event'] == 'updatedictionary':
         if event['option']['source'] == webscrapper.WEB_SAKETIMES:
             print('webscrap start: SAKETIMES')
             scrapper = webscrapper(webscrapper.WEB_SAKETIMES)
             scrapper.writeSAKETIMES2dict()
+
+    elif event['event'] == 'updateitem':
+        pass
+
     else:
-        print('no action')
+        print('sake_handler. no action')
 
 
 def writeErrorLog(filepath, message):

@@ -2,7 +2,6 @@
 {
     'event': 'updatedictionary' # 辞書更新
     'option': {
-        'dict': xxxx,           # 対象辞書
         'source': SAKETIMES     # 更新元
     }
 }
@@ -11,7 +10,6 @@
 {
     'event': 'query'
     'option': {
-        'dict': 'yyyy',         # 検索辞書(str)
         'action': 'select',     # アクション
         'query': 'xxxx',        # 検索語(str)
         'limit': 'int',         # 検索上限(int)
@@ -23,7 +21,6 @@
 {
     'event': 'updatedictionary'
     'option': {
-        'dict': 'xxxx',         # 対象辞書(str)
         'action': 'update'      # 新規登録、更新
         'query': 'xxxx',        # 検索語(str)
         'from': 'yyyy',         # 検索対象(str)
