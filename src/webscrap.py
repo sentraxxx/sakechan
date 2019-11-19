@@ -65,11 +65,11 @@ class webscrapper():
 
                     # 空白はaws dynamodbでNGなので'none'に変更.
                     if url=='': url='none'
-                    if meigara=='': url='none'
-                    if meigara_yomi=='': url='none'
-                    if homepage=='': url='none'
-                    if sakagura_name=='': url='none'
-                    if sakagura_name_yomi=='': url='none'
+                    if meigara=='': meigara='none'
+                    if meigara_yomi=='': meigara_yomi='none'
+                    if homepage=='': homepage='none'
+                    if sakagura_name=='': sakagura_name='none'
+                    if sakagura_name_yomi=='': sakagura_name_yomi='none'
 
                     item = {
                         'area': area,
@@ -83,9 +83,7 @@ class webscrapper():
                     }
                     sake_list_dict.append(item)
 
-#                    if show:
-#                        print(item)
-#                        show = False
+
 
         logging.info(f'aws dynamo[SAKE_LIST] batchupdate start. record = {len(sake_list_dict)}')
         db = dictctrl()

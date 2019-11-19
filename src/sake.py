@@ -54,4 +54,4 @@ if __name__ == "__main__":
         }
     }
 
-    sake_handler(event, None)
+    #sake_handler(event, None)

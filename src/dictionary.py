@@ -11,7 +11,7 @@ class dictctrl():
         self.dict = dict
         TABLE_SAKELIST = 'SAKE_LIST'
 
-        self.db = boto3.resource('dynamodb')
+        self.db = boto3.resource('dynamodb', verify=False)
         print('db type= ',type(self.db))
         self.table: boto3.dynamodb.table = self.db.Table(TABLE_SAKELIST)
         print("Table status:", self.table.table_status)
@@ -23,14 +23,22 @@ class dictctrl():
         """
 
         counter = 0
+        batchlist = []
         with self.table.batch_writer() as batch:
             for it in items:
-                print('counter = ', counter)
-                print(f'item[{counter}]=', it)
-                batch.put_item(
-                    Item= it
-                )
-                counter +=1
+                if (it['meigara'], it['prefecture']) in batchlist:
+                    print(f'batch_write duplicate item: {it}')
+                    continue
+                else:
+                    batchlist.append((it['meigara'], it['prefecture']))
+
+                    #print(f'item[{counter}]=', it)
+                    batch.put_item(
+                        Item= it
+                    )
+                    counter +=1
+                    if counter % 50 == 0:
+                        print('aws dynamodb update.. count= ', counter)
     
     def update(self, item):
         """[summary]
