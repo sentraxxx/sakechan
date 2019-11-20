@@ -7,6 +7,7 @@ import json
 import time
 import warnings
 from webscrap import webscrapper
+from dictionary import dictctrl
 
 MASTER_DICT_FILE = './dict/master/sake_dict.txt'
 
@@ -24,7 +25,9 @@ def sake_handler(event, context):
 
     if event['event'] == 'query':
         queryoption = event['option']
-
+        print(type(queryoption))
+        db = dictctrl()
+        db.query(queryoption)
 
     elif event['event'] == 'updatedictionary':
         if event['option']['source'] == webscrapper.WEB_SAKETIMES:
@@ -39,6 +42,7 @@ def sake_handler(event, context):
         print('sake_handler. no action')
 
 
+
 def writeErrorLog(filepath, message):
     with open(filepath, mode='a') as fa:
         fa.write(message)
@@ -46,12 +50,28 @@ def writeErrorLog(filepath, message):
 
 
 if __name__ == "__main__":
+    print(f'** start {sys._getframe().f_code.co_name}')
 
+    # SAKETIMESからの辞書更新
+    # 2回目やるとawsでduplicateエラーになるので
+    # 新規だけ更新するのは一工夫必要.
+    """
     event = {
         'event': 'updatedictionary',
         'option': {
             'source': webscrapper.WEB_SAKETIMES
         }
     }
+    """
 
-    #sake_handler(event, None)
+    # クエリテスト
+    event = {
+        'event': 'query',
+        'option': {
+            'action': 'select',        # アクション
+            'query': '奥の松',        # 検索語(str)
+            'limit': 1               # 検索上限(int)
+        }
+    }    
+
+    sake_handler(event, None)

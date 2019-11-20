@@ -1,6 +1,8 @@
 import json
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
+import sys
+
 
 class dictctrl():
 
@@ -12,12 +14,11 @@ class dictctrl():
         TABLE_SAKELIST = 'SAKE_LIST'
 
         self.db = boto3.resource('dynamodb', verify=False)
-        print('db type= ',type(self.db))
+        print('db type= ', type(self.db))
         self.table: boto3.dynamodb.table = self.db.Table(TABLE_SAKELIST)
         print("Table status:", self.table.table_status)
 
-
-    def batchupdate(self, items:list):    
+    def batchupdate(self, items: list):
         """ item(dictionary)をdynamodbにupdateする.
         itemの必須項目は('prefecture'(PRYMARY_KEY),'meigara'(SORT_KEY) )
         """
@@ -32,34 +33,40 @@ class dictctrl():
                 else:
                     batchlist.append((it['meigara'], it['prefecture']))
 
-                    #print(f'item[{counter}]=', it)
+                    # print(f'item[{counter}]=', it)
                     batch.put_item(
-                        Item= it
+                        Item=it
                     )
-                    counter +=1
+                    counter += 1
                     if counter % 50 == 0:
                         print('aws dynamodb update.. count= ', counter)
-    
+        return counter
+
     def update(self, item):
         """[summary]
         itemをaws SAKE_LISTに追加更新する.
 
         Arguments:
             item {[dict]} -- [must 'prefecture', 'meigara']
-        """        
+        """
         print('update')
 
-    def query(self, **queryoptions) -> dict:
+    def query(self, queryoptions) -> dict:
         """[summary]
-        
+
         Arguments:
             **queryoptions{[dict]} -- [クエリ―オプション\n
              - ]
 
         Returns:
             dict -- [description]
-        """        
+        """
+        print(f'** start {sys._getframe().f_code.co_name}')
+        print(queryoptions['query'])
 
-        print('query start')
+        # queryテスト
+        #response = self.table.query(KeyConditionExpression=Key('prefecture').eq('青森県') & Key('meigara').eq('田酒'))
+        response = self.table.query(KeyConditionExpression=Key('prefecture').eq('青森県'))
 
 
+        print(f'response = {response}')

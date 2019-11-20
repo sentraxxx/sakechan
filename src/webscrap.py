@@ -87,7 +87,9 @@ class webscrapper():
 
         logging.info(f'aws dynamo[SAKE_LIST] batchupdate start. record = {len(sake_list_dict)}')
         db = dictctrl()
-        db.batchupdate(sake_list_dict)
+        res = db.batchupdate(sake_list_dict)
+        
+        return f'update complete. count={res}'
 
         
 
