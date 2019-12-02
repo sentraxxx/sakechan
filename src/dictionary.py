@@ -66,7 +66,7 @@ class dictctrl():
 
         # queryテスト
         #response = self.table.query(KeyConditionExpression=Key('prefecture').eq('青森県') & Key('meigara').eq('田酒'))
-        response = self.table.query(KeyConditionExpression=Key('prefecture').eq('青森県'))
+        response = self.table.query(KeyConditionExpression=Key('prefecture').eq('新潟県'))
 
 
         print(f'response = {response}')
