@@ -8,10 +8,9 @@
 
 # 辞書検索
 {
-    'event': 'query'
-    'option': {
-        'action': 'select',     # アクション
+    'queryOption': {
         'query': 'xxxx',        # 検索語(str)
+        'key': 'KEY',           # 検索キー
         'limit': 'int',         # 検索上限(int)
         'orderby': 'yyyy',      # 並べ替え対象(str)
     }

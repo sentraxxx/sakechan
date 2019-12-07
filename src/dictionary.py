@@ -6,16 +6,34 @@ import sys
 
 class dictctrl():
 
+    TABLE_SAKELIST = 'SAKE_LIST'
+
+    # SAKE_LISTのKEY
+    # primary key
+    KEY_PREFECTURE = "prefecture"
+
+    # Global secondery Index
+    KEY_GSI_MEIGARA = "meigara"  # key
+    INDEX_GSI_MEIGARA = "meigara-index"  # GSI
+
+    KEY_GSI_MEIGARA_YOMI = "meigara_yomi"
+    INDEX_GSI_MEIGARA_YOMI = "meigara_yomi-index"
+
+    # キー以外の項目
+    KEY_OTHER_PREFECTURE = "prefecture"
+    KEY_OTHER_SAKAGURA_NAME = "sakagura_name"
+    KEY_OTHER_SAKAGURA_NAME_YOMI = "sakagura_name_yomi"
+    KEY_OTHER_URL = "url"
+
     def __init__(self):
         """[summary]
         aws dynamodb(SAKE_LIST)にアクセスするクラス.
         """
         self.dict = dict
-        TABLE_SAKELIST = 'SAKE_LIST'
 
         self.db = boto3.resource('dynamodb', verify=False)
         print('db type= ', type(self.db))
-        self.table: boto3.dynamodb.table = self.db.Table(TABLE_SAKELIST)
+        self.table: boto3.dynamodb.table = self.db.Table(dictctrl.TABLE_SAKELIST)
         print("Table status:", self.table.table_status)
 
     def batchupdate(self, items: list):
@@ -51,22 +69,38 @@ class dictctrl():
         """
         print('update')
 
-    def query(self, queryoptions) -> dict:
+    def query(self, queryoptions):
         """[summary]
 
         Arguments:
             **queryoptions{[dict]} -- [クエリ―オプション\n
-             - ]
+             - key: 検索キー \n
+             - query: 検索語 \n
+             - limit(option): 検索数]
 
         Returns:
-            dict -- [description]
+            dict -- [SAKE_LIST検索結果. dict配列]
         """
         print(f'** start {sys._getframe().f_code.co_name}')
-        print(queryoptions['query'])
+
+        # queryoptionsから条件抽出、設定
+        print(queryoptions) 
+
+        conditions = dict()
+        if "query" in queryoptions and "key" in queryoptions:
+            conditions.setdefault("KeyConditionExpression", Key(dictctrl.KEY_GSI_MEIGARA).eq(queryoptions["query"]))
+        if "key" in queryoptions:
+            if queryoptions["key"] == dictctrl.KEY_GSI_MEIGARA:
+                conditions.setdefault("IndexName",dictctrl.INDEX_GSI_MEIGARA)
+            elif queryoptions["key"] == dictctrl.KEY_GSI_MEIGARA_YOMI:
+                conditions.setdefault("IndexName", dictctrl.INDEX_GSI_MEIGARA_YOMI)
+        if "limit" in queryoptions:
+            conditions.setdefault("Limit", queryoptions["limit"])
 
         # queryテスト
-        #response = self.table.query(KeyConditionExpression=Key('prefecture').eq('青森県') & Key('meigara').eq('田酒'))
-        response = self.table.query(KeyConditionExpression=Key('prefecture').eq('新潟県'))
-
+        # response = self.table.query(KeyConditionExpression=Key('prefecture').eq('青森県') & Key('meigara').eq('田酒'))
+        response = self.table.query(**conditions)
 
         print(f'response = {response}')
+        return response
+        
